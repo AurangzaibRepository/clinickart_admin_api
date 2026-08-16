@@ -27,6 +27,7 @@ import configuration from './config/configuration';
         password: configService.get('database.password'),
         database: configService.get('database.name'),
         autoLoadEntities: true,
+        synchronize: false,
       }),
     }),
     BrandsModule,

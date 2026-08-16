@@ -4,26 +4,40 @@ import {
   Get,
   Post,
   Put,
-  Delete,
   Param,
   Query,
   Body,
   UseInterceptors,
   UploadedFile,
+  ParseIntPipe,
 } from '@nestjs/common';
-import { CreateCategoryDto } from './dto/create-category.dto';
 import { UploadInterceptor } from 'src/common/interceptors/upload.interceptor';
+import { PaginatedResponse } from 'src/common/interfaces/paginated-response.interface';
+import { ApiResponse } from 'src/common/interfaces/api-response.interface';
+import { Category } from './category.entity';
+import { CategoriesService } from './categories.service';
+import { CategoryListingDto } from './dto/category-listing.dto';
+import { CreateCategoryDto } from './dto/create-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
+  constructor(private readonly categoriesService: CategoriesService) {}
+
   @Get()
-  async listing(@Query('name') name: string): Promise<string> {
-    return `Category ${name} listing`;
+  async listing(
+    @Query() query: CategoryListingDto,
+  ): Promise<PaginatedResponse<Category>> {
+    return this.categoriesService.getListing(query);
   }
 
   @Get(':id')
-  async get(@Param('id') id: number): Promise<string> {
-    return `Category ${id}`;
+  async details(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<Category>> {
+    const category = await this.categoriesService.getDetails(id);
+
+    return {
+      status: true,
+      data: category
+    };
   }
 
   @Post()
@@ -31,8 +45,17 @@ export class CategoriesController {
   async create(
     @Body() createCategoryDto: CreateCategoryDto,
     @UploadedFile() image?: Express.Multer.File,
-  ): Promise<string> {
-    return image.path;
+  ): Promise<ApiResponse<Category>> {
+    const category = await this.categoriesService.create({
+      ...createCategoryDto,
+      image: image?.path,
+    });
+
+    return {
+      status: true,
+      message: 'Category created successfully',
+      data: category,
+    };
   }
 
   @Put(':id')

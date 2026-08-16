@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
-import { Category } from 'src/categories/category.entity';
-import { Brand } from 'src/brands/brand.entity';
+import { Category } from '../categories/category.entity';
+import { Brand } from '../brands/brand.entity';
 
 @Entity('products')
 export class Product {
@@ -12,6 +12,9 @@ export class Product {
 
   @Column('text')
   description: string;
+
+  @Column({ type: 'varchar', length: 200 })
+  image: string;
 
   @ManyToOne(() => Category, (category) => category.products)
   category: Category;
