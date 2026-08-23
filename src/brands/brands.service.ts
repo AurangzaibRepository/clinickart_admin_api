@@ -3,10 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { BrandListingDto } from './dto/brand-listing.dto';
 import { Brand } from './brand.entity';
-import { CreateBrandData } from './types/create-brand-data.type';
+import { CreateBrandData, UpdateBrandData } from './types/create-brand-data.type';
 import { PaginatedResponse } from 'src/common/interfaces/paginated-response.interface';
 import { createPagination } from 'src/common/helpers/pagination.helper';
-import { ApiResponse } from 'src/common/interfaces/api-response.interface';
+import { UpdateBrandDto } from './dto/update-brand.dto';
 
 @Injectable()
 export class BrandsService {
@@ -31,7 +31,7 @@ export class BrandsService {
 
   async getDetails(id: number): Promise<Brand> {
     const brand = await this.brandRepository.findOneBy({
-      id
+      id,
     });
 
     if (!brand) {
@@ -43,6 +43,18 @@ export class BrandsService {
 
   async create(data: CreateBrandData): Promise<Brand> {
     const brand = this.brandRepository.create(data);
+
+    return this.brandRepository.save(brand);
+  }
+
+  async update(id: number, data: UpdateBrandData): Promise<Brand> {
+    const brand = await this.brandRepository.findOneBy({ id });
+
+    if (! brand) {
+      throw new NotFoundException('Brand not found');
+    }
+
+    Object.assign(brand, data);
 
     return this.brandRepository.save(brand);
   }

@@ -18,6 +18,9 @@ export class User {
   @Column({ type: 'varchar', length: 80, nullable: true })
   phoneNumber: string;
 
+  @Column({ type: 'varchar', length: 500, select: false })
+  password: string;
+
   @OneToMany(() => Order, (order) => order.user)
   orders: Order[];
 }

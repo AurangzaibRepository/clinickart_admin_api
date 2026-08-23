@@ -1,5 +1,5 @@
-import { ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { AppModule } from './app.module';
@@ -20,6 +20,7 @@ async function bootstrap() {
   );
   app.useGlobalInterceptors(
     new MetricsInterceptor(),
+    new ClassSerializerInterceptor(app.get(Reflector)),
     new ResponseInterceptor(),
   );
 

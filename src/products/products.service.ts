@@ -8,6 +8,7 @@ import { createPagination } from 'src/common/helpers/pagination.helper';
 import { CreateProductData } from './types/create-product-data.type';
 import { Category } from 'src/categories/category.entity';
 import { Brand } from 'src/brands/brand.entity';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -38,6 +39,18 @@ export class ProductsService {
     };
   }
 
+  async getDetails(id: number): Promise<Product> {
+    const product = await this.productRepository.findOneBy({
+      id,
+    });
+
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    return product;
+  }
+
   async create(data: CreateProductData): Promise<Product> {
     const brand = await this.brandRepository.findOneBy({
       id: data.brandId,
@@ -61,6 +74,18 @@ export class ProductsService {
       category: { id: data.categoryId },
       brand: { id: data.brandId },
     });
+
+    return this.productRepository.save(product);
+  }
+
+  async update(id: number, data: UpdateProductDto): Promise<Product> {
+    const product = await this.productRepository.findOneBy({ id });
+
+    if (! product) {
+      throw new NotFoundException('Product not found');
+    }
+
+    Object.assign(product, data);
 
     return this.productRepository.save(product);
   }

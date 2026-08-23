@@ -18,6 +18,7 @@ import { Category } from './category.entity';
 import { CategoriesService } from './categories.service';
 import { CategoryListingDto } from './dto/category-listing.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Controller('categories')
 export class CategoriesController {
@@ -31,12 +32,14 @@ export class CategoriesController {
   }
 
   @Get(':id')
-  async details(@Param('id', ParseIntPipe) id: number): Promise<ApiResponse<Category>> {
+  async details(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ApiResponse<Category>> {
     const category = await this.categoriesService.getDetails(id);
 
     return {
       status: true,
-      data: category
+      data: category,
     };
   }
 
@@ -60,9 +63,15 @@ export class CategoriesController {
 
   @Put(':id')
   async update(
-    @Param('id') id: number,
-    @Body() createCategoryDto: CreateCategoryDto,
-  ): Promise<string> {
-    return `Category ${id} updated`;
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ): Promise<ApiResponse<Category>> {
+    const category = await this.categoriesService.update(id, updateCategoryDto);
+
+    return {
+      status: true,
+      message: 'Category updated successfully',
+      data: category
+    };
   }
 }

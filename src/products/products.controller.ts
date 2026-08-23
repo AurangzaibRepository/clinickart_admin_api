@@ -2,10 +2,13 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Query,
   Body,
   UseInterceptors,
   UploadedFile,
+  Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { ProductListingDto } from './dto/product-listing.dto';
@@ -14,6 +17,7 @@ import { Product } from './product.entity';
 import { UploadInterceptor } from 'src/common/interceptors/upload.interceptor';
 import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 import { CreateProductDto } from './dto/create-product.dto';
+import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -24,6 +28,18 @@ export class ProductsController {
     @Query() query: ProductListingDto,
   ): Promise<PaginatedResponse<Product>> {
     return this.productService.getListing(query);
+  }
+
+  @Get(':id')
+  async details(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ApiResponse<Product>> {
+    const product = await this.productService.getDetails(id);
+
+    return {
+      status: true,
+      data: product,
+    };
   }
 
   @Post()
@@ -41,6 +57,25 @@ export class ProductsController {
       status: true,
       message: 'Product created successfully',
       data: product,
+    };
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateProductDto: UpdateProductDto,
+    @UploadedFile() image?: Express.Multer.File,
+  ): Promise<ApiResponse<Product>>
+  {
+    const product = await this.productService.update(id, {
+      ...updateProductDto,
+      ...(image && { image: image?.path })
+    });
+
+    return {
+      status: true,
+      message: 'Product updated successfully',
+      data: product
     };
   }
 }

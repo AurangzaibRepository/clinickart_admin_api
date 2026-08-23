@@ -7,6 +7,7 @@ import { Category } from './category.entity';
 import { createPagination } from 'src/common/helpers/pagination.helper';
 import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 import { CreateCategoryData } from './types/create-category-data.type';
+import { UpdateCategoryDto } from './dto/update-category.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -38,11 +39,11 @@ export class CategoriesService {
 
   async getDetails(id: number): Promise<Category> {
     const category = await this.categoryRepository.findOneBy({
-        id
+      id,
     });
 
     if (!category) {
-        throw new NotFoundException('Category not found');
+      throw new NotFoundException('Category not found');
     }
 
     return category;
@@ -50,6 +51,19 @@ export class CategoriesService {
 
   async create(data: CreateCategoryData): Promise<Category> {
     const category = this.categoryRepository.create(data);
+
+    return this.categoryRepository.save(category);
+  }
+
+  async update(id: number, data: UpdateCategoryDto): Promise<Category>
+  {
+    const category = await this.categoryRepository.findOneBy({ id });
+
+    if (! category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    Object.assign(category, data);
 
     return this.categoryRepository.save(category);
   }

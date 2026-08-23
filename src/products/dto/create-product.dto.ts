@@ -5,7 +5,7 @@ export class CreateProductDto {
   @IsNotEmpty({ message: 'Name cannot be empty' })
   @MaxLength(100, { message: 'Name cannot exceed more than 100 characters' })
   @Matches('/^[a-zA-Z0-9]+$/', {
-    message: 'Name can only contain numbers, letters and spaces'
+    message: 'Name can only contain numbers, letters and spaces',
   })
   @Transform(({ value }) => value.trim())
   public readonly name: string;
