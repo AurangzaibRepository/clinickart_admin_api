@@ -1,19 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import { BrandListingDto } from './dto/brand-listing.dto';
 import { Brand } from './brand.entity';
-import { CreateBrandData, UpdateBrandData } from './types/create-brand-data.type';
 import { PaginatedResponse } from 'src/common/interfaces/paginated-response.interface';
 import { createPagination } from 'src/common/helpers/pagination.helper';
-import { UpdateBrandDto } from './dto/update-brand.dto';
+import { BaseService } from 'src/common/services/base.service';
+import { AuditService } from 'src/audit/audit.service';
+import { AuditEntityType } from 'src/audit/audit.entity';
 
 @Injectable()
-export class BrandsService {
+export class BrandsService extends BaseService<Brand> {
   constructor(
     @InjectRepository(Brand)
     private readonly brandRepository: Repository<Brand>,
-  ) {}
+    auditService: AuditService,
+  ) {
+    super(brandRepository, AuditEntityType.BRAND, auditService);
+  }
 
   async getListing(query: BrandListingDto): Promise<PaginatedResponse<Brand>> {
     const { name, page, limit } = query;
@@ -27,35 +31,5 @@ export class BrandsService {
       data: brands,
       meta: createPagination(page, limit, totalRecords),
     };
-  }
-
-  async getDetails(id: number): Promise<Brand> {
-    const brand = await this.brandRepository.findOneBy({
-      id,
-    });
-
-    if (!brand) {
-      throw new NotFoundException('Brand not found');
-    }
-
-    return brand;
-  }
-
-  async create(data: CreateBrandData): Promise<Brand> {
-    const brand = this.brandRepository.create(data);
-
-    return this.brandRepository.save(brand);
-  }
-
-  async update(id: number, data: UpdateBrandData): Promise<Brand> {
-    const brand = await this.brandRepository.findOneBy({ id });
-
-    if (! brand) {
-      throw new NotFoundException('Brand not found');
-    }
-
-    Object.assign(brand, data);
-
-    return this.brandRepository.save(brand);
   }
 }

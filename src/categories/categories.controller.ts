@@ -19,6 +19,8 @@ import { CategoriesService } from './categories.service';
 import { CategoryListingDto } from './dto/category-listing.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import type { JwtPayload } from 'src/auth/jwt.strategy';
 
 @Controller('categories')
 export class CategoriesController {
@@ -47,12 +49,16 @@ export class CategoriesController {
   @UseInterceptors(UploadInterceptor('categories'))
   async create(
     @Body() createCategoryDto: CreateCategoryDto,
+    @CurrentUser() user: JwtPayload,
     @UploadedFile() image?: Express.Multer.File,
   ): Promise<ApiResponse<Category>> {
-    const category = await this.categoriesService.create({
-      ...createCategoryDto,
-      image: image?.path,
-    });
+    const category = await this.categoriesService.create(
+      {
+        ...createCategoryDto,
+        image: image?.path,
+      },
+      user,
+    );
 
     return {
       status: true,
@@ -64,14 +70,19 @@ export class CategoriesController {
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: JwtPayload,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ): Promise<ApiResponse<Category>> {
-    const category = await this.categoriesService.update(id, updateCategoryDto);
+    const category = await this.categoriesService.update(
+      id,
+      updateCategoryDto,
+      user,
+    );
 
     return {
       status: true,
       message: 'Category updated successfully',
-      data: category
+      data: category,
     };
   }
 }

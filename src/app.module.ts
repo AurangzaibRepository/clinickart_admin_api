@@ -12,6 +12,9 @@ import { OrderItemsModule } from './order_items/order_items.module';
 import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { Audit } from './audit/audit';
+import { AuditService } from './audit/audit.service';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -39,6 +42,7 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     UsersModule,
     OrderItemsModule,
     AuthModule,
+    AuditModule,
   ],
   controllers: [AppController],
   providers: [
@@ -46,6 +50,8 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    Audit,
+    AuditService,
   ],
 })
 export class AppModule {}

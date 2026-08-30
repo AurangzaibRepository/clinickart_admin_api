@@ -6,5 +6,5 @@ export type CreateBrandData = CreateBrandDto & {
 };
 
 export type UpdateBrandData = UpdateBrandDto & {
-  image?: string
+  image?: string;
 };

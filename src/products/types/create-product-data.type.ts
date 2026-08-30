@@ -7,4 +7,4 @@ export type CreateProductData = CreateProductDto & {
 
 export type UpdateProductData = UpdateProductDto & {
   image?: string;
-}
+};

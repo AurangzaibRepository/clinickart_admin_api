@@ -17,6 +17,8 @@ import { BrandsService } from './brands.service';
 import { Brand } from './brand.entity';
 import { PaginatedResponse } from 'src/common/interfaces/paginated-response.interface';
 import { ApiResponse } from 'src/common/interfaces/api-response.interface';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import type { JwtPayload } from 'src/auth/jwt.strategy';
 
 @Controller('brands')
 export class BrandsController {
@@ -44,12 +46,16 @@ export class BrandsController {
   @Post()
   async create(
     @Body() createBrandDto: CreateBrandDto,
+    @CurrentUser() user: JwtPayload,
     @UploadedFile() image?: Express.Multer.File,
   ): Promise<ApiResponse<Brand>> {
-    const brand = await this.brandService.create({
-      ...createBrandDto,
-      image: image?.path,
-    });
+    const brand = await this.brandService.create(
+      {
+        ...createBrandDto,
+        image: image?.path,
+      },
+      user,
+    );
 
     return {
       status: true,
@@ -62,17 +68,22 @@ export class BrandsController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateBrandDto: UpdateBrandDto,
-    @UploadedFile() image?: Express.Multer.File
+    @CurrentUser() user: JwtPayload,
+    @UploadedFile() image?: Express.Multer.File,
   ): Promise<ApiResponse<Brand>> {
-    const brand = await this.brandService.update(id, {
-      ...updateBrandDto,
-      ...(image && { image: image.path })
-  });
+    const brand = await this.brandService.update(
+      id,
+      {
+        ...updateBrandDto,
+        ...(image && { image: image.path }),
+      },
+      user,
+    );
 
     return {
       status: true,
       message: 'Brand updated successfully',
-      data: brand
+      data: brand,
     };
   }
 }

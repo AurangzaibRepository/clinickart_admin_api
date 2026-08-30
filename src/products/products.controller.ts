@@ -18,6 +18,8 @@ import { UploadInterceptor } from 'src/common/interceptors/upload.interceptor';
 import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import type { JwtPayload } from 'src/auth/jwt.strategy';
 
 @Controller('products')
 export class ProductsController {
@@ -46,12 +48,16 @@ export class ProductsController {
   @UseInterceptors(UploadInterceptor('products'))
   async create(
     @Body() createProductDto: CreateProductDto,
+    @CurrentUser() user: JwtPayload,
     @UploadedFile() image?: Express.Multer.File,
   ): Promise<ApiResponse<Product>> {
-    const product = await this.productService.create({
-      ...createProductDto,
-      image: image?.path,
-    });
+    const product = await this.productService.create(
+      {
+        ...createProductDto,
+        image: image?.path,
+      },
+      user,
+    );
 
     return {
       status: true,
@@ -60,22 +66,32 @@ export class ProductsController {
     };
   }
 
+  @Post('bulk-upload')
+  async bulkUpload(
+    @CurrentUser() user: JwtPayload,
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<ApiResponse<Product>> {}
+
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
+    @CurrentUser() user: JwtPayload,
     @UploadedFile() image?: Express.Multer.File,
-  ): Promise<ApiResponse<Product>>
-  {
-    const product = await this.productService.update(id, {
-      ...updateProductDto,
-      ...(image && { image: image?.path })
-    });
+  ): Promise<ApiResponse<Product>> {
+    const product = await this.productService.update(
+      id,
+      {
+        ...updateProductDto,
+        ...(image && { image: image?.path }),
+      },
+      user,
+    );
 
     return {
       status: true,
       message: 'Product updated successfully',
-      data: product
+      data: product,
     };
   }
 }

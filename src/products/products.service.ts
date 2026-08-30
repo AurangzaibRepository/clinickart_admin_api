@@ -1,17 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, DeepPartial } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './product.entity';
 import { PaginatedResponse } from 'src/common/interfaces/paginated-response.interface';
 import { ProductListingDto } from './dto/product-listing.dto';
 import { createPagination } from 'src/common/helpers/pagination.helper';
-import { CreateProductData } from './types/create-product-data.type';
 import { Category } from 'src/categories/category.entity';
 import { Brand } from 'src/brands/brand.entity';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { BaseService } from 'src/common/services/base.service';
+import { AuditEntityType } from 'src/audit/audit.entity';
+import { AuditService } from 'src/audit/audit.service';
+import { ExcelService } from 'src/common/excel/excel.service';
+import {
+  CreateProductData,
+  UpdateProductData,
+} from './types/create-product-data.type';
+import { JwtPayload } from 'src/auth/jwt.strategy';
 
 @Injectable()
-export class ProductsService {
+export class ProductsService extends BaseService<Product> {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
@@ -21,7 +28,11 @@ export class ProductsService {
 
     @InjectRepository(Brand)
     private readonly brandRepository: Repository<Brand>,
-  ) {}
+    private readonly excelService: ExcelService,
+    auditService: AuditService,
+  ) {
+    super(productRepository, AuditEntityType.PRODUCT, auditService);
+  }
 
   async getListing(
     query: ProductListingDto,
@@ -51,42 +62,50 @@ export class ProductsService {
     return product;
   }
 
-  async create(data: CreateProductData): Promise<Product> {
-    const brand = await this.brandRepository.findOneBy({
-      id: data.brandId,
-    });
-
-    if (!brand) {
-      throw new NotFoundException('Brand not found');
-    }
-
-    const category = await this.categoryRepository.findOneBy({
-      id: data.categoryId,
-    });
-
-    if (!category) {
-      throw new NotFoundException('Category not found');
-    }
-
-    const product = this.productRepository.create({
-      name: data.name,
-      description: data.description,
-      category: { id: data.categoryId },
+  async create(data: CreateProductData, user: JwtPayload) {
+    const { brandId, categoryId, ...rest } = data;
+    const transformedData = {
+      ...rest,
       brand: { id: data.brandId },
-    });
+      category: { id: data.categoryId },
+    };
 
-    return this.productRepository.save(product);
+    return super.create(transformedData, user);
   }
 
-  async update(id: number, data: UpdateProductDto): Promise<Product> {
-    const product = await this.productRepository.findOneBy({ id });
+  async update(id: number, data: UpdateProductData, user: JwtPayload) {
+    const { brandId, categoryId, ...rest } = data;
+    const transformedData = {
+      ...rest,
+      ...(brandId !== undefined && {
+        brand: { id: brandId },
+      }),
+      ...(categoryId !== undefined && {
+        category: { id: categoryId },
+      }),
+    };
 
-    if (! product) {
-      throw new NotFoundException('Product not found');
-    }
+    const audit = {
+      data: {
+        ...rest,
+        ...(brandId !== undefined && { brandId }),
+        ...(categoryId !== undefined && { categoryId }),
+      },
+      fieldMap: {
+        brandId: 'brand',
+        categoryId: 'category',
+      },
+    };
 
-    Object.assign(product, data);
-
-    return this.productRepository.save(product);
+    return super.update(
+      id,
+      transformedData,
+      user,
+      {
+        brand: true,
+        category: true,
+      },
+      audit,
+    );
   }
 }
