@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Put,
+  Delete,
   Query,
   Body,
   UseInterceptors,
@@ -20,6 +21,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import type { JwtPayload } from 'src/auth/jwt.strategy';
+import { ExcelUploadInterceptor } from 'src/common/interceptors/excel-upload.interceptor';
 
 @Controller('products')
 export class ProductsController {
@@ -67,10 +69,18 @@ export class ProductsController {
   }
 
   @Post('bulk-upload')
+  @UseInterceptors(ExcelUploadInterceptor())
   async bulkUpload(
     @CurrentUser() user: JwtPayload,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<ApiResponse<Product>> {}
+  ): Promise<ApiResponse> {
+    await this.productService.bulkUpload(file, user);
+
+    return {
+      status: true,
+      message: 'Products uploaded successfully',
+    };
+  }
 
   @Put(':id')
   async update(
@@ -92,6 +102,19 @@ export class ProductsController {
       status: true,
       message: 'Product updated successfully',
       data: product,
+    };
+  }
+
+  @Delete(':id')
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<ApiResponse> {
+    await this.productService.delete(id, user);
+
+    return {
+      status: true,
+      message: 'Product deactivated successfully',
     };
   }
 }

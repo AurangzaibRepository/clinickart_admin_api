@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository, Like, DataSource } from 'typeorm';
 import { CategoryListingDto } from './dto/category-listing.dto';
 import { PaginatedResponse } from 'src/common/interfaces/paginated-response.interface';
 import { Category } from './category.entity';
@@ -8,12 +8,19 @@ import { createPagination } from 'src/common/helpers/pagination.helper';
 import { BaseService } from 'src/common/services/base.service';
 import { AuditEntityType } from 'src/audit/audit.entity';
 import { AuditService } from 'src/audit/audit.service';
+import { JwtPayload } from 'src/auth/jwt.strategy';
+import { Product } from 'src/products/product.entity';
 
 @Injectable()
 export class CategoriesService extends BaseService<Category> {
   constructor(
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
+
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+
+    private readonly dataSource: DataSource,
     auditService: AuditService,
   ) {
     super(categoryRepository, AuditEntityType.CATEGORY, auditService);
@@ -38,5 +45,18 @@ export class CategoriesService extends BaseService<Category> {
       data: categories,
       meta: createPagination(page, limit, totalRecords),
     };
+  }
+
+  async delete(id: number, user: JwtPayload): Promise<void> {
+    await this.dataSource.transaction(async (manager) => {
+      await manager
+        .getRepository(Product)
+        .createQueryBuilder()
+        .softDelete()
+        .where('categoryId = :categoryId', { categoryId: id })
+        .execute();
+
+      await super.delete(id, user, manager);
+    });
   }
 }

@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   Put,
+  Delete,
   Param,
   Query,
   Body,
@@ -83,6 +84,19 @@ export class CategoriesController {
       status: true,
       message: 'Category updated successfully',
       data: category,
+    };
+  }
+
+  @Delete(':id')
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<ApiResponse> {
+    await this.categoriesService.delete(id, user);
+
+    return {
+      status: true,
+      message: 'Category deactivated successfully',
     };
   }
 }

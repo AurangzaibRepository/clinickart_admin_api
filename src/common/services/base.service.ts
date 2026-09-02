@@ -4,6 +4,7 @@ import {
   FindOptionsWhere,
   FindOptionsRelations,
   Repository,
+  EntityManager,
 } from 'typeorm';
 import { AuditEntityType } from 'src/audit/audit.entity';
 import { AuditAction } from 'src/audit/audit.entity';
@@ -71,9 +72,10 @@ export abstract class BaseService<T extends BaseEntity> {
     }
 
     // Calculate old and new values if changed
+    const dataForAudit = audit?.data ?? data;
+    const fieldMap = audit?.fieldMap ?? {};
     const oldValues: Record<string, any> = {};
     const newValues: Record<string, any> = {};
-    const dataForAudit = auditData ?? data;
 
     for (const key of Object.keys(dataForAudit)) {
       /*if (entity[key] != data[key]) {
@@ -82,8 +84,9 @@ export abstract class BaseService<T extends BaseEntity> {
             }*/
 
       // For relation object comparison
+      const entityKey = fieldMap[key] ?? key;
       const newValue = dataForAudit[key];
-      const oldValue = entity[key];
+      const oldValue = entity[entityKey];
 
       const newId =
         newValue && typeof newValue === 'object' ? newValue.id : newValue;
@@ -112,5 +115,35 @@ export abstract class BaseService<T extends BaseEntity> {
     }
 
     return savedEntity;
+  }
+
+  async delete(
+    id: number,
+    user: JwtPayload,
+    manager?: EntityManager,
+  ): Promise<void> {
+    const repository = manager
+      ? manager.getRepository(this.repository.target)
+      : this.repository;
+
+    // Check if record exists
+    const entity = await repository.findOneBy({ id } as FindOptionsWhere<T>);
+
+    if (!entity) {
+      throw new NotFoundException('Record not found');
+    }
+
+    // Soft delete
+    await repository.softDelete(id);
+
+    // Audit
+    await this.auditService.log(
+      user.sub,
+      AuditAction.DELETE,
+      this.auditEntityType,
+      id,
+      null,
+      null,
+    );
   }
 }
