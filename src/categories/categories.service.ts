@@ -10,6 +10,7 @@ import { AuditEntityType } from 'src/audit/audit.entity';
 import { AuditService } from 'src/audit/audit.service';
 import { JwtPayload } from 'src/auth/jwt.strategy';
 import { Product } from 'src/products/product.entity';
+import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 
 @Injectable()
 export class CategoriesService extends BaseService<Category> {
@@ -17,13 +18,19 @@ export class CategoriesService extends BaseService<Category> {
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
 
-    @InjectRepository(Product)
-    private readonly productRepository: Repository<Product>,
-
     private readonly dataSource: DataSource,
     auditService: AuditService,
   ) {
     super(categoryRepository, AuditEntityType.CATEGORY, auditService);
+  }
+
+  async getAll(): Promise<Category[]> {
+    const categories = await this.categoryRepository.find({
+      select: {'id': true, 'name': true},
+      order: { name: 'ASC' }
+    });
+
+    return categories;
   }
 
   async getListing(
@@ -37,6 +44,9 @@ export class CategoriesService extends BaseService<Category> {
     const [categories, totalRecords] =
       await this.categoryRepository.findAndCount({
         where,
+        order: {
+          name: 'ASC',
+        },
         skip: (page - 1) * limit,
         take: limit,
       });

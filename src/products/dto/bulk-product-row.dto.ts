@@ -13,6 +13,9 @@ export class BulkProductRowDto {
   @Transform(({ value }) => value?.trim())
   public readonly description: string;
 
+  @IsNotEmpty({ message: 'Price cannot be empty' })
+  public readonly price: number;
+
   @IsNotEmpty({ message: 'Category cannot be empty' })
   @Transform(({ value }) => value?.trim())
   public readonly category: string;

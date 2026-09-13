@@ -47,6 +47,19 @@ export class ProductsService extends BaseService<Product> {
     const { name, page, limit } = query;
     const [products, totalRecords] = await this.productRepository.findAndCount({
       where: name ? { name: Like(`%${name}%`) } : {},
+      relations: {
+        category: true
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        category: {
+          id: true,
+          name: true,
+        }
+      },
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -58,8 +71,25 @@ export class ProductsService extends BaseService<Product> {
   }
 
   async getDetails(id: number): Promise<Product> {
-    const product = await this.productRepository.findOneBy({
-      id,
+    const product = await this.productRepository.findOne({
+      where: { id },
+      relations: {
+        category: true,
+        brand: true
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        image: true,
+        category: {
+          id: true
+        },
+        brand: {
+          id: true
+        }
+      }
     });
 
     if (!product) {
@@ -76,7 +106,6 @@ export class ProductsService extends BaseService<Product> {
       brand: { id: data.brandId },
       category: { id: data.categoryId },
     };
-
     return super.create(transformedData, user);
   }
 
@@ -137,7 +166,7 @@ export class ProductsService extends BaseService<Product> {
 
       if (errors.length > 0) {
         validationErrors.push({
-          row: index + 2,
+          row: index + 1,
           errors,
         });
 
@@ -148,7 +177,7 @@ export class ProductsService extends BaseService<Product> {
       const productName = dto.name.toLocaleLowerCase();
       if (seenProductNames.has(productName)) {
         validationErrors.push({
-          row: index + 2,
+          row: index + 1,
           message: `Duplicate product ${productName}`,
         });
       } else {
@@ -174,6 +203,7 @@ export class ProductsService extends BaseService<Product> {
     categoryNames = [...new Set(categoryNames)];
     productNames = [...new Set(productNames)];
 
+    
     // Get all matching brands in database
     let brands = await this.brandRepository
       .createQueryBuilder('brand')
@@ -182,6 +212,7 @@ export class ProductsService extends BaseService<Product> {
       })
       .getMany();
 
+      /*
     // Find missing brands
     const existingBrandNames = new Set(
       brands.map((brand) => brand.name.toLocaleLowerCase()),
@@ -189,7 +220,7 @@ export class ProductsService extends BaseService<Product> {
 
     const missingBrandNames = brandNames.filter(
       (name) => !existingBrandNames.has(name),
-    );
+    ); */
 
     // Get all matching categories in database
     const categories = await this.categoryRepository
@@ -199,6 +230,7 @@ export class ProductsService extends BaseService<Product> {
       })
       .getMany();
 
+      /*
     // Find missing categories
     const existingCategoryNames = new Set(
       categories.map((category) => category.name.toLocaleLowerCase()),
@@ -231,21 +263,21 @@ export class ProductsService extends BaseService<Product> {
 
       if (missingBrandNamesSet.has(brandName)) {
         validationErrors.push({
-          row: index + 2,
+          row: index + 1,
           message: `Brand ${brandName} does not exist`,
         });
       }
 
       if (missingCategoryNamesSet.has(categoryName)) {
         validationErrors.push({
-          row: index + 2,
+          row: index + 1,
           message: `Category ${categoryName} does not exist`,
         });
       }
 
       if (existingProductNames.has(dto.name.toLocaleLowerCase())) {
         validationErrors.push({
-          row: index + 2,
+          row: index + 1,
           message: `Product ${dto.name} already exists`,
         });
       }
@@ -257,10 +289,8 @@ export class ProductsService extends BaseService<Product> {
         message: 'Excel validation failed',
         errors: validationErrors,
       });
-    }
+    } */
 
-    /* Create brand and category maps to fetch from here
-     instead of fetching everyting from database */
     const brandMap = new Map(
       brands.map((brand) => [brand.name.toLowerCase(), brand]),
     );
@@ -269,6 +299,54 @@ export class ProductsService extends BaseService<Product> {
       categories.map((category) => [category.name.toLowerCase(), category]),
     );
 
+    const newBrands = rows
+    .map((row) => plainToInstance(BulkProductRowDto, row).brand)
+    .filter((name) => !brandMap.has(name.toLowerCase()))
+    .filter(
+        (name, index, names) =>
+            names.findIndex(
+                (item) => item.toLowerCase() === name.toLowerCase(),
+            ) === index,
+    )
+    .map((name) =>
+        this.brandRepository.create({
+            name,
+            description: name
+        }),
+    );
+
+    if (newBrands.length > 0) {
+        const savedBrands = await this.brandRepository.save(newBrands);
+
+        savedBrands.forEach((brand) => {
+            brandMap.set(brand.name.toLowerCase(), brand);
+        });
+    }
+
+    const newCategories = rows
+    .map((row) => plainToInstance(BulkProductRowDto, row).category)
+    .filter((name) => !categoryMap.has(name.toLowerCase()))
+    .filter(
+        (name, index, names) =>
+            names.findIndex(
+                (item) => item.toLowerCase() === name.toLowerCase(),
+            ) === index,
+    )
+    .map((name) =>
+        this.categoryRepository.create({
+            name,
+            description: name
+        }),
+    );
+
+  if (newCategories.length > 0) {
+      const saveCategories = await this.categoryRepository.save(newCategories);
+
+      saveCategories.forEach((category) => {
+          categoryMap.set(category.name.toLowerCase(), category);
+      });
+  }
+
     // Save products
     const products = rows.map((row) => {
       const dto = plainToInstance(BulkProductRowDto, row);
@@ -276,6 +354,7 @@ export class ProductsService extends BaseService<Product> {
       return this.productRepository.create({
         name: dto.name,
         description: dto.description,
+        price: dto.price,
         brand: brandMap.get(dto.brand.toLowerCase()),
         category: categoryMap.get(dto.category.toLowerCase()),
       });

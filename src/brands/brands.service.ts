@@ -22,10 +22,22 @@ export class BrandsService extends BaseService<Brand> {
     super(brandRepository, AuditEntityType.BRAND, auditService);
   }
 
+  async getAll(): Promise<Brand[]> {
+    const brands = await this.brandRepository.find({
+      select: { id: true, name: true},
+      order: {name: 'ASC'}
+    });
+
+    return brands;
+  }
+
   async getListing(query: BrandListingDto): Promise<PaginatedResponse<Brand>> {
     const { name, page, limit } = query;
     const [brands, totalRecords] = await this.brandRepository.findAndCount({
       where: name ? { name: Like(`%${name}%`) } : {},
+      order: {
+        name: 'ASC',
+      },
       skip: (page - 1) * limit,
       take: limit,
     });
@@ -34,5 +46,13 @@ export class BrandsService extends BaseService<Brand> {
       data: brands,
       meta: createPagination(page, limit, totalRecords),
     };
+  }
+
+  async testCache(): Promise<string | undefined> {
+    await this.cacheService.save('brand:list', 'Brand listing goes here');
+
+    const cachedValue = await this.cacheService.get<string>('brand:list');
+    console.log(cachedValue);
+    return cachedValue;
   }
 }

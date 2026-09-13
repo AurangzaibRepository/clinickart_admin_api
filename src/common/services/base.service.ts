@@ -43,14 +43,14 @@ export abstract class BaseService<T extends BaseEntity> {
     const entity = this.repository.create(data);
     const savedEntity = await this.repository.save(entity);
 
-    await this.auditService.log(
+    /*await this.auditService.log(
       user.sub,
       AuditAction.CREATE,
       this.auditEntityType,
       savedEntity.id,
       null,
       data as Record<string, any>,
-    );
+    );*/
 
     return savedEntity;
   }
@@ -61,7 +61,7 @@ export abstract class BaseService<T extends BaseEntity> {
     user: JwtPayload,
     relations?: FindOptionsRelations<T>,
     audit?: AuditOptions,
-  ): Promise<T | null> {
+  ): Promise<T | undefined> {
     const entity = await this.repository.findOne({
       where: { id } as FindOptionsWhere<T>,
       relations,
@@ -94,24 +94,25 @@ export abstract class BaseService<T extends BaseEntity> {
       const oldId =
         oldValue && typeof oldValue === 'object' ? oldValue.id : oldValue;
 
-      if (oldId != newId) {
+      /*if (oldId != newId) {
         oldValues[key] = oldId;
         newValue[key] = newId;
-      }
+      }*/
     }
 
     Object.assign(entity, data);
+    console.log(data);
     const savedEntity = await this.repository.save(entity);
 
     if (Object.keys(oldValues).length > 0) {
-      await this.auditService.log(
+      /*await this.auditService.log(
         user.sub,
         AuditAction.UPDATE,
         this.auditEntityType,
         savedEntity.id,
         oldValues,
         newValues,
-      );
+      );*/
     }
 
     return savedEntity;

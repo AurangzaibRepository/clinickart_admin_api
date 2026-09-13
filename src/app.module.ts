@@ -12,9 +12,9 @@ import { OrderItemsModule } from './order_items/order_items.module';
 import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
-import { Audit } from './audit/audit';
-import { AuditService } from './audit/audit.service';
+import { AppService } from './app.service';
 import { AuditModule } from './audit/audit.module';
+import { CustomerModule } from './customer/customer.module';
 
 @Module({
   imports: [
@@ -43,15 +43,15 @@ import { AuditModule } from './audit/audit.module';
     OrderItemsModule,
     AuthModule,
     AuditModule,
+    CustomerModule,
   ],
   controllers: [AppController],
   providers: [
-    {
+    /*{
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
-    },
-    Audit,
-    AuditService,
+    },*/
+    AppService
   ],
 })
 export class AppModule {}

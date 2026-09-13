@@ -2,13 +2,13 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
   DeleteDateColumn,
+  ManyToOne
 } from 'typeorm';
 import { Transform } from 'class-transformer';
 import { Category } from '../categories/category.entity';
 import { Brand } from '../brands/brand.entity';
-import { getFileUrl } from 'src/common/helpers/file-path.helper';
+import { getFileUrl } from '../common/helpers/file-path.helper';
 
 @Entity('products')
 export class Product {
@@ -21,9 +21,17 @@ export class Product {
   @Column('text')
   description: string;
 
-  @Column({ type: 'varchar', length: 200, nullable: true })
-  @Transform(({ value }) => getFileUrl(value, process.env.APP_URL))
+ @Column({ type: 'varchar', length: 200, nullable: true })
+  @Transform(({ value }) => getFileUrl(   value ? `uploads/${value}` : null,
+    process.env.APP_URL || 'http://localhost:8000',))
   image: string;
+
+  @Column({
+    type: 'decimal',
+    precision: 10,
+    scale: 2
+  })
+  price: number;
 
   @ManyToOne(() => Category, (category) => category.products)
   category: Category;

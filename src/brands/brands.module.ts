@@ -3,10 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BrandsController } from './brands.controller';
 import { BrandsService } from './brands.service';
 import { Brand } from './brand.entity';
-import { CacheModule } from '@nestjs/cache-manager';
+import { CacheModule } from '../common/cache/cache.module';
+import { AuditModule } from 'src/audit/audit.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Brand]), CacheModule],
+  imports: [TypeOrmModule.forFeature([Brand]), CacheModule, AuditModule],
   controllers: [BrandsController],
   providers: [BrandsService],
 })

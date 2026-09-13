@@ -20,4 +20,12 @@ export class CacheService {
   async delete(key: string): Promise<void> {
     await this.cacheManager.del(key);
   }
+
+  async testConnection(): Promise<string> {
+    await this.cacheManager.set('connection:test', 'Redis is working');
+  
+    const value = await this.cacheManager.get<string>('connection:test');
+  
+    return value ?? 'NOT FOUND';
+  }
 }

@@ -7,4 +7,7 @@ export class ProductListingDto extends PaginationDto {
 
   @IsOptional()
   public readonly description?: string;
+
+  @IsOptional()
+  public readonly image?: string;
 }

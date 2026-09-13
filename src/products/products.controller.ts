@@ -56,7 +56,7 @@ export class ProductsController {
     const product = await this.productService.create(
       {
         ...createProductDto,
-        image: image?.path,
+        image: `products/${image?.filename}`,
       },
       user,
     );
@@ -83,6 +83,7 @@ export class ProductsController {
   }
 
   @Put(':id')
+  @UseInterceptors(UploadInterceptor('products'))
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
@@ -93,7 +94,7 @@ export class ProductsController {
       id,
       {
         ...updateProductDto,
-        ...(image && { image: image?.path }),
+        ...(image && { image: `products/${image?.filename}` }),
       },
       user,
     );

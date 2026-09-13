@@ -1,4 +1,4 @@
-import { Express } from 'express';
+import type { Express } from 'express';
 import {
   Controller,
   Get,
@@ -8,11 +8,8 @@ import {
   Param,
   Query,
   Body,
-  UseInterceptors,
-  UploadedFile,
   ParseIntPipe,
 } from '@nestjs/common';
-import { UploadInterceptor } from 'src/common/interceptors/upload.interceptor';
 import { PaginatedResponse } from 'src/common/interfaces/paginated-response.interface';
 import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 import { Category } from './category.entity';
@@ -34,6 +31,16 @@ export class CategoriesController {
     return this.categoriesService.getListing(query);
   }
 
+  @Get('all')
+  async getAll() {
+    const categories = await this.categoriesService.getAll();
+
+    return {
+      status: true,
+      data: categories
+    };
+  }
+
   @Get(':id')
   async details(
     @Param('id', ParseIntPipe) id: number,
@@ -47,19 +54,11 @@ export class CategoriesController {
   }
 
   @Post()
-  @UseInterceptors(UploadInterceptor('categories'))
   async create(
     @Body() createCategoryDto: CreateCategoryDto,
-    @CurrentUser() user: JwtPayload,
-    @UploadedFile() image?: Express.Multer.File,
+    @CurrentUser() user: JwtPayload
   ): Promise<ApiResponse<Category>> {
-    const category = await this.categoriesService.create(
-      {
-        ...createCategoryDto,
-        image: image?.path,
-      },
-      user,
-    );
+    const category = await this.categoriesService.create(createCategoryDto, user);
 
     return {
       status: true,
