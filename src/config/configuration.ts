@@ -16,6 +16,6 @@ export default () => ({
     expiresIn: '1h',
   },
   redis: {
-    url: process.env.REDIS_URL
-  }
+    url: process.env.REDIS_URL,
+  },
 });

@@ -26,8 +26,8 @@ export class CategoriesService extends BaseService<Category> {
 
   async getAll(): Promise<Category[]> {
     const categories = await this.categoryRepository.find({
-      select: {'id': true, 'name': true},
-      order: { name: 'ASC' }
+      select: { id: true, name: true },
+      order: { name: 'ASC' },
     });
 
     return categories;

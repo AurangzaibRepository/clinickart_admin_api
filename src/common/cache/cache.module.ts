@@ -14,11 +14,7 @@ import { CacheService } from './cache.service';
       inject: [ConfigService],
 
       useFactory: (configService: ConfigService) => ({
-        stores: [
-          createKeyv(
-            configService.getOrThrow<string>('redis.url'),
-          ),
-        ],
+        stores: [createKeyv(configService.getOrThrow<string>('redis.url'))],
       }),
     }),
   ],

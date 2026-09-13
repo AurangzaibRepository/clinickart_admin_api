@@ -24,8 +24,8 @@ export class BrandsService extends BaseService<Brand> {
 
   async getAll(): Promise<Brand[]> {
     const brands = await this.brandRepository.find({
-      select: { id: true, name: true},
-      order: {name: 'ASC'}
+      select: { id: true, name: true },
+      order: { name: 'ASC' },
     });
 
     return brands;

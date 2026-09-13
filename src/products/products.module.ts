@@ -9,7 +9,11 @@ import { ExcelModule } from 'src/common/excel/excel.module';
 import { AuditModule } from 'src/audit/audit.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product, Category, Brand]), ExcelModule, AuditModule],
+  imports: [
+    TypeOrmModule.forFeature([Product, Category, Brand]),
+    ExcelModule,
+    AuditModule,
+  ],
   controllers: [ProductsController],
   providers: [ProductsService],
 })

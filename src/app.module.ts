@@ -51,7 +51,7 @@ import { CustomerModule } from './customer/customer.module';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },*/
-    AppService
+    AppService,
   ],
 })
 export class AppModule {}

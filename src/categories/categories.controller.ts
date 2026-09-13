@@ -37,7 +37,7 @@ export class CategoriesController {
 
     return {
       status: true,
-      data: categories
+      data: categories,
     };
   }
 
@@ -56,9 +56,12 @@ export class CategoriesController {
   @Post()
   async create(
     @Body() createCategoryDto: CreateCategoryDto,
-    @CurrentUser() user: JwtPayload
+    @CurrentUser() user: JwtPayload,
   ): Promise<ApiResponse<Category>> {
-    const category = await this.categoriesService.create(createCategoryDto, user);
+    const category = await this.categoriesService.create(
+      createCategoryDto,
+      user,
+    );
 
     return {
       status: true,

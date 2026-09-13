@@ -23,9 +23,9 @@ export class CacheService {
 
   async testConnection(): Promise<string> {
     await this.cacheManager.set('connection:test', 'Redis is working');
-  
+
     const value = await this.cacheManager.get<string>('connection:test');
-  
+
     return value ?? 'NOT FOUND';
   }
 }

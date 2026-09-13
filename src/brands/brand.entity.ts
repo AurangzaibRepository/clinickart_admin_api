@@ -16,10 +16,10 @@ export class Brand {
 
   @Column({ type: 'varchar', length: 200, nullable: true })
   @Transform(({ value }) =>
-      getFileUrl(
-          value ? `uploads/${value}` : null,
-          process.env.APP_URL || 'http://localhost:8000',
-      ),
+    getFileUrl(
+      value ? `uploads/${value}` : null,
+      process.env.APP_URL || 'http://localhost:8000',
+    ),
   )
   logo: string;
 

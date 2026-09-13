@@ -15,7 +15,9 @@ export class Category {
   description: string;
 
   @Column({ type: 'varchar', length: 300, nullable: true })
-  @Transform(({ value }) => getFileUrl(value, process.env.APP_URL || 'http://localhost:8000/api'))
+  @Transform(({ value }) =>
+    getFileUrl(value, process.env.APP_URL || 'http://localhost:8000/api'),
+  )
   image: string;
 
   @OneToMany(() => Product, (product) => product.category)

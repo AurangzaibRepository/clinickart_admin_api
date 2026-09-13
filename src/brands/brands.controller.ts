@@ -38,7 +38,7 @@ export class BrandsController {
 
     return {
       status: true,
-      data: brands
+      data: brands,
     };
   }
 

@@ -9,10 +9,7 @@ import { ResponseInterceptor } from './common/interceptors/response.interceptor'
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   console.log('__dirname:', __dirname);
-console.log(
-    'uploads path:',
-    join(__dirname, '..', 'uploads')
-);
+  console.log('uploads path:', join(__dirname, '..', 'uploads'));
   app.useStaticAssets(join(__dirname, '..', '..', 'uploads'), {
     prefix: '/uploads',
   });

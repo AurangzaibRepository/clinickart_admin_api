@@ -48,7 +48,7 @@ export class ProductsService extends BaseService<Product> {
     const [products, totalRecords] = await this.productRepository.findAndCount({
       where: name ? { name: Like(`%${name}%`) } : {},
       relations: {
-        category: true
+        category: true,
       },
       select: {
         id: true,
@@ -58,7 +58,7 @@ export class ProductsService extends BaseService<Product> {
         category: {
           id: true,
           name: true,
-        }
+        },
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -75,7 +75,7 @@ export class ProductsService extends BaseService<Product> {
       where: { id },
       relations: {
         category: true,
-        brand: true
+        brand: true,
       },
       select: {
         id: true,
@@ -84,12 +84,12 @@ export class ProductsService extends BaseService<Product> {
         price: true,
         image: true,
         category: {
-          id: true
+          id: true,
         },
         brand: {
-          id: true
-        }
-      }
+          id: true,
+        },
+      },
     });
 
     if (!product) {
@@ -203,7 +203,6 @@ export class ProductsService extends BaseService<Product> {
     categoryNames = [...new Set(categoryNames)];
     productNames = [...new Set(productNames)];
 
-    
     // Get all matching brands in database
     let brands = await this.brandRepository
       .createQueryBuilder('brand')
@@ -212,7 +211,7 @@ export class ProductsService extends BaseService<Product> {
       })
       .getMany();
 
-      /*
+    /*
     // Find missing brands
     const existingBrandNames = new Set(
       brands.map((brand) => brand.name.toLocaleLowerCase()),
@@ -230,7 +229,7 @@ export class ProductsService extends BaseService<Product> {
       })
       .getMany();
 
-      /*
+    /*
     // Find missing categories
     const existingCategoryNames = new Set(
       categories.map((category) => category.name.toLocaleLowerCase()),
@@ -300,52 +299,52 @@ export class ProductsService extends BaseService<Product> {
     );
 
     const newBrands = rows
-    .map((row) => plainToInstance(BulkProductRowDto, row).brand)
-    .filter((name) => !brandMap.has(name.toLowerCase()))
-    .filter(
+      .map((row) => plainToInstance(BulkProductRowDto, row).brand)
+      .filter((name) => !brandMap.has(name.toLowerCase()))
+      .filter(
         (name, index, names) =>
-            names.findIndex(
-                (item) => item.toLowerCase() === name.toLowerCase(),
-            ) === index,
-    )
-    .map((name) =>
+          names.findIndex(
+            (item) => item.toLowerCase() === name.toLowerCase(),
+          ) === index,
+      )
+      .map((name) =>
         this.brandRepository.create({
-            name,
-            description: name
+          name,
+          description: name,
         }),
-    );
+      );
 
     if (newBrands.length > 0) {
-        const savedBrands = await this.brandRepository.save(newBrands);
+      const savedBrands = await this.brandRepository.save(newBrands);
 
-        savedBrands.forEach((brand) => {
-            brandMap.set(brand.name.toLowerCase(), brand);
-        });
+      savedBrands.forEach((brand) => {
+        brandMap.set(brand.name.toLowerCase(), brand);
+      });
     }
 
     const newCategories = rows
-    .map((row) => plainToInstance(BulkProductRowDto, row).category)
-    .filter((name) => !categoryMap.has(name.toLowerCase()))
-    .filter(
+      .map((row) => plainToInstance(BulkProductRowDto, row).category)
+      .filter((name) => !categoryMap.has(name.toLowerCase()))
+      .filter(
         (name, index, names) =>
-            names.findIndex(
-                (item) => item.toLowerCase() === name.toLowerCase(),
-            ) === index,
-    )
-    .map((name) =>
+          names.findIndex(
+            (item) => item.toLowerCase() === name.toLowerCase(),
+          ) === index,
+      )
+      .map((name) =>
         this.categoryRepository.create({
-            name,
-            description: name
+          name,
+          description: name,
         }),
-    );
+      );
 
-  if (newCategories.length > 0) {
+    if (newCategories.length > 0) {
       const saveCategories = await this.categoryRepository.save(newCategories);
 
       saveCategories.forEach((category) => {
-          categoryMap.set(category.name.toLowerCase(), category);
+        categoryMap.set(category.name.toLowerCase(), category);
       });
-  }
+    }
 
     // Save products
     const products = rows.map((row) => {

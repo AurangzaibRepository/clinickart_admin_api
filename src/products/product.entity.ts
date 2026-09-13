@@ -3,7 +3,7 @@ import {
   Column,
   PrimaryGeneratedColumn,
   DeleteDateColumn,
-  ManyToOne
+  ManyToOne,
 } from 'typeorm';
 import { Transform } from 'class-transformer';
 import { Category } from '../categories/category.entity';
@@ -21,15 +21,19 @@ export class Product {
   @Column('text')
   description: string;
 
- @Column({ type: 'varchar', length: 200, nullable: true })
-  @Transform(({ value }) => getFileUrl(   value ? `uploads/${value}` : null,
-    process.env.APP_URL || 'http://localhost:8000',))
+  @Column({ type: 'varchar', length: 200, nullable: true })
+  @Transform(({ value }) =>
+    getFileUrl(
+      value ? `uploads/${value}` : null,
+      process.env.APP_URL || 'http://localhost:8000',
+    ),
+  )
   image: string;
 
   @Column({
     type: 'decimal',
     precision: 10,
-    scale: 2
+    scale: 2,
   })
   price: number;
 
