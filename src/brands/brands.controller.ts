@@ -20,7 +20,6 @@ import { PaginatedResponse } from 'src/common/interfaces/paginated-response.inte
 import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import type { JwtPayload } from 'src/auth/jwt.strategy';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadInterceptor } from 'src/common/interceptors/upload.interceptor';
 
 @Controller('brands')
