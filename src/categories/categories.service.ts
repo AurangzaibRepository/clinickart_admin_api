@@ -10,7 +10,6 @@ import { AuditEntityType } from 'src/audit/audit.entity';
 import { AuditService } from 'src/audit/audit.service';
 import { JwtPayload } from 'src/auth/jwt.strategy';
 import { Product } from 'src/products/product.entity';
-import { ApiResponse } from 'src/common/interfaces/api-response.interface';
 
 @Injectable()
 export class CategoriesService extends BaseService<Category> {
