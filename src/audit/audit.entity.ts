@@ -19,6 +19,7 @@ export enum AuditEntityType {
   PRODUCT = 'PRODUCT',
   USER = 'USER',
   ORDER = 'ORDER',
+  CUSTOMER = 'CUSTOMER',
 }
 
 @Entity('audit_logs')
