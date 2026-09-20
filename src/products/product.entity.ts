@@ -4,10 +4,12 @@ import {
   PrimaryGeneratedColumn,
   DeleteDateColumn,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { Transform } from 'class-transformer';
 import { Category } from '../categories/category.entity';
 import { Brand } from '../brands/brand.entity';
+import { OrderItem } from '../order-items/order-item.entity';
 import { getFileUrl } from '../common/helpers/file-path.helper';
 
 @Entity('products')
@@ -42,6 +44,9 @@ export class Product {
 
   @ManyToOne(() => Brand, (brand) => brand.products)
   brand: Brand;
+
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.product)
+  orderItems: OrderItem[];
 
   @DeleteDateColumn({ nullable: true })
   deletedAt: Date;

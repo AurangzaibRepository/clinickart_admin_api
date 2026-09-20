@@ -10,7 +10,7 @@ import { Public } from './public.decorator';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @Post('/login')
   async login(@Body() loginDto: LoginDto): Promise<ApiResponse<LoginResponse>> {
     const user = await this.authService.login(loginDto);
 

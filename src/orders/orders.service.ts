@@ -37,6 +37,21 @@ export class OrdersService {
             },
             skip: (page - 1) * limit,
             take: limit,
+            relations: {
+                customer: true
+            },
+            select: {
+                id: true,
+                orderNumber: true,
+                totalPrice: true,
+                status: true,
+                createdAt: true,
+                customer: {
+                    id: true,
+                    firstName: true,
+                    lastName: true
+                }
+            }
           });
     
         return {
@@ -50,6 +65,9 @@ export class OrdersService {
             where: { id },
             relations: {
                 customer: true,
+                orderItems: {
+                    product: true,
+                },
             },
         });
     

@@ -8,7 +8,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
 import { UsersModule } from './users/users.module';
-import { OrderItemsModule } from './order_items/order_items.module';
+import { OrderItemsModule } from './order-items/order-items.module';
 import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
