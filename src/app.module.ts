@@ -15,6 +15,8 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { AppService } from './app.service';
 import { AuditModule } from './audit/audit.module';
 import { CustomerModule } from './customer/customer.module';
+import { DealsModule } from './deals/deals.module';
+import { DealtagsModule } from './dealtags/dealtags.module';
 
 @Module({
   imports: [
@@ -44,6 +46,8 @@ import { CustomerModule } from './customer/customer.module';
     AuthModule,
     AuditModule,
     CustomerModule,
+    DealsModule,
+    DealtagsModule,
   ],
   controllers: [AppController],
   providers: [

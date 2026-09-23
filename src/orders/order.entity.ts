@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, BaseEntity } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  OneToMany,
+  BaseEntity,
+} from 'typeorm';
 import { Customer } from '../customer/customer.entity';
 import { OrderItem } from '../order-items/order-item.entity';
 import { OrderStatus } from '../enums/order-status.enum';
@@ -15,7 +22,11 @@ export class Order extends CustomBaseEntity {
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 0.0 })
   totalPrice: number;
 
-  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.PAYMENT_PENDING })
+  @Column({
+    type: 'enum',
+    enum: OrderStatus,
+    default: OrderStatus.PAYMENT_PENDING,
+  })
   status: OrderStatus;
 
   @ManyToOne(() => Customer, (customer) => customer.orders)

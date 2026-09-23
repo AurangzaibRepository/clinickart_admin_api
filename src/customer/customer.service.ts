@@ -9,7 +9,6 @@ import { BaseService } from 'src/common/services/base.service';
 import { AuditService } from 'src/audit/audit.service';
 import { AuditEntityType } from 'src/audit/audit.entity';
 import { ChangeStatusCustomerDto } from './dto/change-status-customer.dto';
-import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class CustomerService extends BaseService<Customer> {
