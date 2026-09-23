@@ -16,7 +16,7 @@ import { AppService } from './app.service';
 import { AuditModule } from './audit/audit.module';
 import { CustomerModule } from './customer/customer.module';
 import { DealsModule } from './deals/deals.module';
-import { DealtagsModule } from './dealtags/dealtags.module';
+import { DealtagsModule } from './deal-tags/deal-tags.module';
 
 @Module({
   imports: [

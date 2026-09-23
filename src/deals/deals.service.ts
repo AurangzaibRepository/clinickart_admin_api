@@ -95,8 +95,7 @@ export class DealsService extends BaseService<Deal> {
   async updateRecord(
     id: number,
     data: UpdateDealDto & { image?: string },
-    user: JwtPayload,
-  ) {
+  ): Promise<void> {
     const { tags, ...dealData } = data;
 
     const deal = await this.dealRepository.findOne({
@@ -128,7 +127,7 @@ export class DealsService extends BaseService<Deal> {
       }
     }
 
-    return this.dealRepository.findOne({
+    await this.dealRepository.findOne({
       where: { id },
       relations: {
         dealTags: true,

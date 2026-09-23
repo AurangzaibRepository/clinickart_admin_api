@@ -73,19 +73,15 @@ export class DealsController {
     @Body() updateDealDto: UpdateDealDto,
     @CurrentUser() user: JwtPayload,
     @UploadedFile() image?: Express.Multer.File,
-  ): Promise<ApiResponse<Deal>> {
-    const deal = await this.dealService.updateRecord(
-      {
-        ...updateDealDto,
-        ...(image && { image: `deals/${image?.filename}` }),
-      },
-      user,
-    );
+  ): Promise<ApiResponse> {
+    const deal = await this.dealService.updateRecord(id, {
+      ...updateDealDto,
+      ...(image && { image: `deals/${image?.filename}` }),
+    });
 
     return {
       status: true,
       message: 'Deal updated successfully',
-      data: deal,
     };
   }
 
