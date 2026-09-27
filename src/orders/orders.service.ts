@@ -45,8 +45,7 @@ export class OrdersService {
         createdAt: true,
         customer: {
           id: true,
-          firstName: true,
-          lastName: true,
+          name: true,
         },
       },
     });

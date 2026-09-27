@@ -6,17 +6,17 @@ export class Customer {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 100 })
-  firstName: string;
-
-  @Column({ type: 'varchar', length: 100 })
-  lastName: string;
+  @Column({ type: 'varchar', length: 200 })
+  name: string;
 
   @Column({ type: 'varchar', length: 100 })
   email: string;
 
   @Column({ type: 'varchar', length: 100 })
   phoneNumber: string;
+
+  @Column({ type: 'varchar', length: 100 })
+  city: string;
 
   @Column({ type: 'varchar', length: 500 })
   password: string;

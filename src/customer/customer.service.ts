@@ -27,11 +27,9 @@ export class CustomerService extends BaseService<Customer> {
     const { name, page, limit } = query;
     const [customers, totalRecords] =
       await this.customerRepository.findAndCount({
-        where: name
-          ? [{ firstName: Like(`%${name}%`) }, { lastName: Like(`%${name}%`) }]
-          : {},
+        where: name ? { name: Like(`%${name}%`) } : {},
         order: {
-          firstName: 'ASC',
+          name: 'ASC',
         },
         skip: (page - 1) * limit,
         take: limit,
