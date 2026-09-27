@@ -36,11 +36,11 @@ export class DealsController {
   async details(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ApiResponse<Deal>> {
-    const customer = await this.dealService.getDetails(id);
+    const deals = await this.dealService.getRecord(id);
 
     return {
       status: true,
-      data: customer,
+      data: deals,
     };
   }
 

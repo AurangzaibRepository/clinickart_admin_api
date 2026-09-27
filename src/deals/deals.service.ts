@@ -53,7 +53,7 @@ export class DealsService extends BaseService<Deal> {
     };
   }
 
-  async getDetail(id: number) {
+  async getRecord(id: number) {
     const deal = await this.dealRepository.findOne({
       where: { id },
       relations: {
@@ -65,10 +65,7 @@ export class DealsService extends BaseService<Deal> {
       throw new NotFoundException('Deal not found');
     }
 
-    return {
-      ...deal,
-      tags: deal.dealTags.map((tag) => tag.name).join(', '),
-    };
+    return deal;
   }
 
   async create(data: CreateDealDto & { image?: string }, user: JwtPayload) {

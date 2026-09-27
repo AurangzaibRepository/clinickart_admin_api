@@ -13,9 +13,9 @@ export class CreateDealDto {
 
   @IsOptional()
   @IsArray()
-  @MaxLength(10, {
+  @MaxLength(30, {
     each: true,
-    message: 'Each tag cannot exceed 10 characters',
+    message: 'Each tag cannot exceed 30 characters',
   })
   @Transform(({ value }) => (Array.isArray(value) ? value : [value]))
   public readonly tags?: string[];

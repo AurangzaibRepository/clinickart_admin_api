@@ -16,7 +16,10 @@ export class Deal {
 
   @Column({ type: 'varchar', length: 300 })
   @Transform(({ value }) =>
-    getFileUrl(value, process.env.APP_URL || 'http://localhost:8000/api'),
+    getFileUrl(
+      value ? `uploads/${value}` : null,
+      process.env.APP_URL || 'http://localhost:8000',
+    ),
   )
   image: string;
 
