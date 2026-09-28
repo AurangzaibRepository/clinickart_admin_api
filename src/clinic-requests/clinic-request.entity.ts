@@ -21,6 +21,6 @@ export class ClinicRequest {
   @Column({ type: 'varchar', length: 100 })
   package: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   description: string;
 }
