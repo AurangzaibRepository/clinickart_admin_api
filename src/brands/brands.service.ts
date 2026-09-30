@@ -48,6 +48,36 @@ export class BrandsService extends BaseService<Brand> {
     };
   }
 
+  async getRecord(id: number) {
+    const brand = await this.brandRepository.findOne({
+      where: { id },
+      select: {
+        id: true,
+        name: true,
+        average_rating: true,
+        logo: true,
+        ratings: {
+          id: true,
+          rating: true,
+          customer: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      relations: {
+        ratings: {
+          customer: true,
+        },
+      },
+      order: {
+        name: 'ASC',
+      },
+    });
+
+    return brand;
+  }
+
   async testCache(): Promise<string | undefined> {
     await this.cacheService.save('brand:list', 'Brand listing goes here');
 

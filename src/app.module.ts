@@ -18,6 +18,7 @@ import { CustomerModule } from './customer/customer.module';
 import { DealsModule } from './deals/deals.module';
 import { DealtagsModule } from './deal-tags/deal-tags.module';
 import { ClinicRequestsModule } from './clinic-requests/clinic-requests.module';
+import { BrandRatingsModule } from './brand-ratings/brand-ratings.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { ClinicRequestsModule } from './clinic-requests/clinic-requests.module';
     DealsModule,
     DealtagsModule,
     ClinicRequestsModule,
+    BrandRatingsModule,
   ],
   controllers: [AppController],
   providers: [

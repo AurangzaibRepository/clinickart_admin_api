@@ -49,10 +49,8 @@ export class BrandsController {
   }
 
   @Get(':id')
-  async details(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<ApiResponse<Brand>> {
-    const brand = await this.brandService.getDetails(id);
+  async details(@Param('id', ParseIntPipe) id: number) {
+    const brand = await this.brandService.getRecord(id);
 
     return {
       status: true,
